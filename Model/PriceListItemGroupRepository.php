@@ -9,22 +9,28 @@ class PriceListItemGroupRepository implements \Dealer4dealer\Xcore\Api\PriceList
     protected $searchResultsFactory;
     protected $searchCriteriaBuilder;
 
+    /** @var \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup */
+    protected $priceListItemGroupResource;
+
     /**
-     * @param \Dealer4dealer\Xcore\Api\Data\PriceListItemGroupInterfaceFactory|\Magento\Framework\App\Config\BaseFactory              $priceListItemGroupFactory
+     * @param \Dealer4dealer\Xcore\Api\Data\PriceListItemGroupInterfaceFactory|\Magento\Framework\App\Config\BaseFactory $priceListItemGroupFactory
      * @param \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup\CollectionFactory|\Magento\Framework\App\Config\BaseFactory $priceListItemGroupCollectionFactory
      * @param \Dealer4dealer\Xcore\Api\Data\PriceListItemGroupSearchResultsInterfaceFactory|\Magento\Framework\App\Config\BaseFactory $searchResultsFactory
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder                                                                            $searchCriteriaBuilder
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup $priceListItemGroupResource
      */
     public function __construct(
         \Dealer4dealer\Xcore\Api\Data\PriceListItemGroupInterfaceFactory $priceListItemGroupFactory,
         \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup\CollectionFactory $priceListItemGroupCollectionFactory,
         \Dealer4dealer\Xcore\Api\Data\PriceListItemGroupSearchResultsInterfaceFactory $searchResultsFactory,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup $priceListItemGroupResource
     ) {
         $this->priceListItemGroupFactory           = $priceListItemGroupFactory;
         $this->priceListItemGroupCollectionFactory = $priceListItemGroupCollectionFactory;
         $this->searchResultsFactory                = $searchResultsFactory;
         $this->searchCriteriaBuilder               = $searchCriteriaBuilder;
+        $this->priceListItemGroupResource          = $priceListItemGroupResource;
     }
 
     /**
@@ -34,7 +40,7 @@ class PriceListItemGroupRepository implements \Dealer4dealer\Xcore\Api\PriceList
     {
         try {
             /** @var PriceListItemGroup $priceListItemGroup */
-            $priceListItemGroup->getResource()->save($priceListItemGroup);
+            $this->priceListItemGroupResource->save($priceListItemGroup);
         } catch (\Exception $exception) {
             throw new \Magento\Framework\Exception\CouldNotSaveException(
                 __(sprintf('Could not save the Price List Item Group: %s', $exception->getMessage()))
@@ -48,9 +54,9 @@ class PriceListItemGroupRepository implements \Dealer4dealer\Xcore\Api\PriceList
      */
     public function getById($priceListItemGroupId)
     {
-        /** @var PriceListItem $priceListItemGroup */
+        /** @var PriceListItemGroup $priceListItemGroup */
         $priceListItemGroup = $this->priceListItemGroupFactory->create();
-        $priceListItemGroup->getResource()->load($priceListItemGroup, $priceListItemGroupId);
+        $this->priceListItemGroupResource->load($priceListItemGroup, $priceListItemGroupId);
         if (!$priceListItemGroup->getId()) {
             throw new \Magento\Framework\Exception\NoSuchEntityException(
                 __(sprintf('Price List Item Group with id %s does not exist', $priceListItemGroupId))
@@ -104,7 +110,7 @@ class PriceListItemGroupRepository implements \Dealer4dealer\Xcore\Api\PriceList
     {
         try {
             /** @var PriceListItemGroup $priceListItemGroup */
-            $priceListItemGroup->getResource()->delete($priceListItemGroup);
+            $this->priceListItemGroupResource->delete($priceListItemGroup);
         } catch (\Exception $exception) {
             throw new \Magento\Framework\Exception\CouldNotDeleteException(
                 __(sprintf('Could not delete the price_list_item_group: %s', $exception->getMessage()))

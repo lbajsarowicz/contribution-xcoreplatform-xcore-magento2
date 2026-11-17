@@ -11,13 +11,25 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
     protected $priceListItemRepository;
     protected $priceListItemGroupRepository;
 
+    /** @var \Dealer4dealer\Xcore\Model\ResourceModel\PriceList */
+    protected $priceListResource;
+
+    /** @var \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItem */
+    protected $priceListItemResource;
+
+    /** @var \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup */
+    protected $priceListItemGroupResource;
+
     /**
-     * @param \Psr\Log\LoggerInterface                                                                                       $logger
-     * @param \Dealer4dealer\Xcore\Api\Data\PriceListInterfaceFactory|\Magento\Framework\App\Config\BaseFactory              $priceListFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Dealer4dealer\Xcore\Api\Data\PriceListInterfaceFactory|\Magento\Framework\App\Config\BaseFactory $priceListFactory
      * @param \Dealer4dealer\Xcore\Model\ResourceModel\PriceList\CollectionFactory|\Magento\Framework\App\Config\BaseFactory $priceListCollectionFactory
      * @param \Dealer4dealer\Xcore\Api\Data\PriceListSearchResultsInterfaceFactory|\Magento\Framework\App\Config\BaseFactory $searchResultsFactory
-     * @param \Dealer4dealer\Xcore\Api\PriceListItemRepositoryInterface                                                      $priceListItemRepository
-     * @param \Dealer4dealer\Xcore\Api\PriceListItemGroupRepositoryInterface                                                 $priceListItemGroupRepository
+     * @param \Dealer4dealer\Xcore\Api\PriceListItemRepositoryInterface $priceListItemRepository
+     * @param \Dealer4dealer\Xcore\Api\PriceListItemGroupRepositoryInterface $priceListItemGroupRepository
+     * @param \Dealer4dealer\Xcore\Model\ResourceModel\PriceList $priceListResource
+     * @param \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItem $priceListItemResource
+     * @param \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup $priceListItemGroupResource
      */
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
@@ -25,7 +37,10 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
         \Dealer4dealer\Xcore\Model\ResourceModel\PriceList\CollectionFactory $priceListCollectionFactory,
         \Dealer4dealer\Xcore\Api\Data\PriceListSearchResultsInterfaceFactory $searchResultsFactory,
         \Dealer4dealer\Xcore\Api\PriceListItemRepositoryInterface $priceListItemRepository,
-        \Dealer4dealer\Xcore\Api\PriceListItemGroupRepositoryInterface $priceListItemGroupRepository
+        \Dealer4dealer\Xcore\Api\PriceListItemGroupRepositoryInterface $priceListItemGroupRepository,
+        \Dealer4dealer\Xcore\Model\ResourceModel\PriceList $priceListResource,
+        \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItem $priceListItemResource,
+        \Dealer4dealer\Xcore\Model\ResourceModel\PriceListItemGroup $priceListItemGroupResource
     ) {
         $this->logger                       = $logger;
         $this->priceListFactory             = $priceListFactory;
@@ -33,6 +48,9 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
         $this->searchResultsFactory         = $searchResultsFactory;
         $this->priceListItemRepository      = $priceListItemRepository;
         $this->priceListItemGroupRepository = $priceListItemGroupRepository;
+        $this->priceListResource            = $priceListResource;
+        $this->priceListItemResource        = $priceListItemResource;
+        $this->priceListItemGroupResource   = $priceListItemGroupResource;
     }
 
     /**
@@ -42,7 +60,7 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
     {
         try {
             /** @var PriceList $priceList */
-            $priceList->getResource()->save($priceList);
+            $this->priceListResource->save($priceList);
         } catch (\Exception $exception) {
             throw new \Magento\Framework\Exception\CouldNotSaveException(__(sprintf('Could not save the Price List: %s', $exception->getMessage())));
         }
@@ -56,7 +74,7 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
     {
         /** @var PriceList $priceList */
         $priceList = $this->priceListFactory->create();
-        $priceList->getResource()->load($priceList, $priceListId);
+        $this->priceListResource->load($priceList, $priceListId);
         if (!$priceList->getId()) {
             throw new \Magento\Framework\Exception\NoSuchEntityException(__(sprintf('Price List with id %s does not exist', $priceListId)));
         }
@@ -110,7 +128,7 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
     {
         try {
             /** @var PriceList $priceList */
-            $priceList->getResource()->delete($priceList);
+            $this->priceListResource->delete($priceList);
         } catch (\Exception $exception) {
             throw new \Magento\Framework\Exception\CouldNotDeleteException(
                 __(sprintf('Could not delete the Price List: %s', $exception->getMessage()))
@@ -152,7 +170,7 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
     {
         /** @var PriceList $priceList */
         $priceList = $this->priceListFactory->create();
-        $priceList->getResource()->load($priceList, $id);
+        $this->priceListResource->load($priceList, $id);
         if (!$priceList->getId()) {
             return null;
         }
@@ -172,7 +190,7 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
     {
         /** @var PriceList $priceList */
         $priceList = $this->priceListFactory->create();
-        $priceList->getResource()->load($priceList, $guid, 'guid');
+        $this->priceListResource->load($priceList, $guid, 'guid');
         if (!$priceList->getGuid()) {
             return null;
         }
@@ -235,13 +253,13 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
     {
         /** @var PriceList $priceList */
         $priceList = $this->priceListFactory->create();
-        $priceList->getResource()->load($priceList, $newPriceList->getGuid(), 'guid');
+        $this->priceListResource->load($priceList, $newPriceList->getGuid(), 'guid');
 
         $priceList->setGuid($newPriceList->getGuid());
         $priceList->setCode($newPriceList->getCode());
         $priceList->setCustomerGroupIds($newPriceList->getCustomerGroupIds());
 
-        $priceList->getResource()->save($priceList);
+        $this->priceListResource->save($priceList);
 
         return $priceList;
     }
@@ -250,7 +268,7 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
      * @param int                                                  $priceListId
      * @param \Dealer4dealer\Xcore\Api\Data\PriceListItemInterface $item
      *
-     * @return PriceListItem
+     * @return PriceListItem|null
      */
     private function getOrSavePriceListItem(int $priceListId, \Dealer4dealer\Xcore\Api\Data\PriceListItemInterface $item)
     {
@@ -268,12 +286,14 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
             $priceListItem->setProcessed(0);
             $priceListItem->setErrorCount(0);
 
-            $priceListItem->getResource()->save($priceListItem);
+            $this->priceListItemResource->save($priceListItem);
 
             return $priceListItem;
         } catch (\Exception $exception) {
             $this->logger->error(sprintf('Failed to get or save price list item: %s', $exception->getMessage()));
         }
+
+        return null;
     }
 
     /**
@@ -305,7 +325,7 @@ class PriceListRepository implements \Dealer4dealer\Xcore\Api\PriceListRepositor
             $priceListItemGroupNew->setProcessed(0);
             $priceListItemGroupNew->setErrorCount(0);
 
-            $priceListItemGroupNew->getResource()->save($priceListItemGroupNew);
+            $this->priceListItemGroupResource->save($priceListItemGroupNew);
         } catch (\Exception $exception) {
             $this->logger->error(sprintf('Failed to get or save price list item: %s', $exception->getMessage()));
         }
