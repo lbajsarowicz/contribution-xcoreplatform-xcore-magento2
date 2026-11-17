@@ -2,6 +2,7 @@
 
 namespace Dealer4dealer\Xcore\Setup;
 
+use Magento\Customer\Model\ResourceModel\Attribute as AttributeResource;
 use Magento\Customer\Setup\CustomerSetup;
 use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -16,6 +17,8 @@ class UpgradeData implements UpgradeDataInterface
     private $customerSetupFactory;
     private $searchCriteriaBuilder;
     private $taxClassRepository;
+    /** @var AttributeResource */
+    private $attributeResource;
     const NOTE = 'This setting is part of the Price List add-on in the xCore.
                   Interested? Install the add-on for your xCore app. 
                   For more information, contact us at www.dealer4dealer.nl!';
@@ -52,7 +55,7 @@ class UpgradeData implements UpgradeDataInterface
                                                          'adminhtml_customer'
                                                      ]
                                                  ]);
-            $attribute->save();
+            $this->attributeResource->save($attribute);
 
             $customerSetup->addAttribute('customer', 'vat_class', [
                 'type'     => 'varchar',
@@ -73,7 +76,7 @@ class UpgradeData implements UpgradeDataInterface
                                                          'adminhtml_customer'
                                                      ]
                                                  ]);
-            $attribute->save();
+            $this->attributeResource->save($attribute);
 
             /**
              * Install tax classes
@@ -142,14 +145,17 @@ class UpgradeData implements UpgradeDataInterface
      * @param CustomerSetupFactory  $customerSetupFactory
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param TaxClassRepository    $taxRepository
+     * @param AttributeResource     $attributeResource
      */
     public function __construct(
         CustomerSetupFactory $customerSetupFactory,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        TaxClassRepository $taxRepository
+        TaxClassRepository $taxRepository,
+        AttributeResource $attributeResource
     ) {
         $this->customerSetupFactory  = $customerSetupFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->taxClassRepository    = $taxRepository;
+        $this->attributeResource     = $attributeResource;
     }
 }
